@@ -1,0 +1,377 @@
+/* Variables CSS pour la cohérence des couleurs et la facilité de maintenance */
+:root {
+    --primary-color: #3498db;
+    --primary-dark: #2980b9;
+    --success-color: #2ecc71;
+    --success-dark: #27ae60;
+    --danger-color: #e74c3c;
+    --danger-dark: #c0392b;
+    --text-color: #333;
+    --text-light: #555;
+    --bg-main: #f5f5f5;
+    --bg-light: #f9f9f9;
+    --bg-white: #ffffff;
+    --border-color: #ddd;
+    --shadow-color: rgba(0,0,0,0.1);
+    --shadow-color-darker: rgba(0,0,0,0.3);
+    --highlight-bg: #e8f4f8;
+    --code-bg: #f8f8f8;
+    --border-radius-small: 3px;
+    --border-radius: 5px;
+    --border-radius-large: 8px;
+    --spacing-small: 10px;
+    --spacing: 15px;
+    --spacing-large: 20px;
+    --spacing-xl: 30px;
+    --font-family-main: Arial, sans-serif;
+    --font-family-code: monospace;
+}
+
+/* Styles généraux */
+body {
+    font-family: var(--font-family-main);
+    line-height: 1.6;
+    margin: 0;
+    padding: var(--spacing-large);
+    background-color: var(--bg-main);
+    color: var(--text-color);
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--bg-white);
+    padding: var(--spacing-large);
+    border-radius: var(--border-radius-large);
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+h1, h2, h3, h4 {
+    color: var(--text-color);
+    margin-top: var(--spacing);
+    margin-bottom: var(--spacing);
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* Navigation et boutons */
+.button {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+    padding: var(--spacing-small) var(--spacing-large);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    font-weight: bold;
+    margin-right: var(--spacing-small);
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.button:hover {
+    background-color: var(--primary-dark);
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.button:focus {
+    outline: 2px solid var(--primary-dark);
+    outline-offset: 2px;
+}
+
+.navigation {
+    margin-bottom: var(--spacing-large);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-small);
+}
+
+/* Éléments de formulaire */
+input[type="text"], 
+textarea,
+select {
+    width: 100%;
+    padding: var(--spacing-small);
+    margin: var(--spacing-small) 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    font-family: var(--font-family-main);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus, 
+textarea:focus,
+select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    outline: none;
+}
+
+button, 
+input[type="submit"] {
+    cursor: pointer;
+}
+
+/* Sections et cartes */
+.feature,
+.chapter,
+.page,
+.prompt-box,
+.case {
+    margin-bottom: var(--spacing);
+    padding: var(--spacing);
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius);
+}
+
+.feature {
+    transition: transform 0.3s ease;
+}
+
+.feature:hover {
+    transform: translateY(-2px);
+}
+
+.steps {
+    margin-left: var(--spacing-large);
+}
+
+.chapter,
+.page,
+.prompt-box {
+    border-left: 4px solid var(--primary-color);
+}
+
+.case {
+    background-color: var(--bg-white);
+    box-shadow: 0 1px 3px var(--shadow-color);
+}
+
+.prompt-text {
+    background-color: var(--code-bg);
+    padding: var(--spacing-small);
+    border-radius: var(--border-radius);
+    font-family: var(--font-family-code);
+    white-space: pre-wrap;
+    margin-top: var(--spacing-small);
+    overflow-x: auto;
+}
+
+.copy-button {
+    background-color: var(--success-color);
+    color: var(--bg-white);
+    padding: 5px var(--spacing-small);
+    border: none;
+    border-radius: var(--border-radius-small);
+    cursor: pointer;
+    font-size: 0.8em;
+    margin-left: var(--spacing-small);
+    transition: background-color 0.3s ease;
+}
+
+.copy-button:hover {
+    background-color: var(--success-dark);
+}
+
+.success {
+    background-color: var(--success-color);
+}
+
+.error-message {
+    color: var(--danger-color);
+    font-weight: bold;
+    padding: var(--spacing-small);
+    background-color: #fadbd8;
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-large);
+}
+
+.loading {
+    text-align: center;
+    padding: var(--spacing-large);
+    font-style: italic;
+    color: var(--text-light);
+}
+
+/* Styles pour les contrôles de session */
+.session-controls {
+    background-color: var(--code-bg);
+    padding: var(--spacing-small);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-large);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-small);
+}
+
+.session-buttons {
+    display: flex;
+    gap: var(--spacing-small);
+    flex-wrap: wrap;
+}
+
+.session-button {
+    background-color: var(--primary-dark);
+    color: var(--bg-white);
+    padding: var(--spacing-small) var(--spacing-large);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.session-button:hover {
+    transform: translateY(-2px);
+}
+
+.session-select {
+    padding: var(--spacing-small);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-white);
+    min-width: 200px;
+}
+
+.session-info {
+    margin-top: var(--spacing-small);
+    font-style: italic;
+    color: var(--text-light);
+}
+
+#new-session-btn {
+    background-color: var(--success-dark);
+}
+
+#new-session-btn:hover {
+    background-color: var(--success-color);
+}
+
+#delete-session-btn {
+    background-color: var(--danger-color);
+}
+
+#delete-session-btn:hover {
+    background-color: var(--danger-dark);
+}
+
+/* Instructions */
+.instructions {
+    background-color: var(--highlight-bg);
+    padding: var(--spacing);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-large);
+    border-left: 4px solid var(--primary-color);
+}
+
+.code-block {
+    background-color: var(--code-bg);
+    padding: var(--spacing-small);
+    border-radius: var(--border-radius);
+    font-family: var(--font-family-code);
+    white-space: pre-wrap;
+    margin: var(--spacing-small) 0;
+    border: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+
+/* Styles pour les liens actifs dans la navigation */
+.button.active {
+    background-color: var(--primary-dark);
+    box-shadow: 0 0 5px var(--shadow-color-darker);
+}
+
+/* Media queries pour le responsive design */
+@media (max-width: 768px) {
+    .container {
+        padding: var(--spacing);
+    }
+    
+    .session-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .session-info {
+        text-align: center;
+    }
+    
+    .navigation {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .button, .session-button {
+        margin-right: 0;
+        margin-bottom: var(--spacing-small);
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: var(--spacing-small);
+    }
+    
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    h2 {
+        font-size: 1.5em;
+    }
+}
+
+/* Styles d'impression */
+@media print {
+    body {
+        background-color: var(--bg-white);
+        padding: 0;
+    }
+    
+    .container {
+        max-width: 100%;
+        box-shadow: none;
+        padding: 0;
+    }
+    
+    .navigation, 
+    .session-controls, 
+    .copy-button,
+    #new-session-btn,
+    #delete-session-btn {
+        display: none;
+    }
+}
+
+/* Améliorations d'accessibilité */
+:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Support des préfixes pour les navigateurs plus anciens */
+@supports (-webkit-appearance: none) or (-moz-appearance: none) {
+    .session-select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3e%3cpath d='M7 10l5 5 5-5z' fill='%23333'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right var(--spacing-small) center;
+        padding-right: 30px;
+    }
+}
