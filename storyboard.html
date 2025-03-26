@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storyboard - BD Creator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>BD Creator - Storyboard</h1>
+        
+        <!-- Contrôles de session -->
+        <div class="session-controls">
+            <div class="session-buttons">
+                <button id="save-session-btn" class="session-button">Sauvegarder la session</button>
+                <button id="new-session-btn" class="session-button">Nouvelle session</button>
+                <select id="load-session-select" class="session-select">
+                    <option value="">Charger une session...</option>
+                </select>
+            </div>
+            <div id="session-info" class="session-info">
+                Session actuelle: <span id="current-session-name">Nouvelle session</span>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <a href="index.html" class="button">Accueil</a>
+            <a href="scenario.html" class="button">Scénario</a>
+            <a href="storyboard.html" class="button active">Storyboard</a>
+            <a href="prompts.html" class="button">Prompts</a>
+        </div>
+        
+        <h2>Storyboard pour le chapitre : <span id="chapter-title">Chapitre non sélectionné</span></h2>
+        <p>Voici le storyboard généré pour ce chapitre. Chaque page contient entre 3 et 7 cases avec des descriptions visuelles et des dialogues.</p>
+        
+        <div class="chapter-selection">
+            <label for="chapter-select">Sélectionner un chapitre :</label>
+            <select id="chapter-select">
+                <option value="">Choisir un chapitre...</option>
+            </select>
+            <button id="load-chapter-btn">Charger</button>
+        </div>
+        
+        <div id="storyboard-container" class="storyboard-container">
+            <p>Chargement du storyboard...</p>
+        </div>
+        
+        <div class="storyboard-controls">
+            <button id="edit-storyboard-btn">Éditer le storyboard</button>
+            <button id="save-storyboard-btn">Sauvegarder les modifications</button>
+        </div>
+        
+        <div class="navigation">
+            <p>
+                <a href="prompts.html" class="button" id="generate-prompts-link">Générer les prompts</a>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Inclure les scripts -->
+    <script src="bd_creator_session_manager.js"></script>
+    <script src="storyboard.js"></script>
+    <script src="main.js"></script>
+    
+    <script>
+        // Script d'initialisation pour la page storyboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier si SessionManager est disponible
+            if (typeof SessionManager !== 'undefined') {
+                // Charger les sessions sauvegardées
+                SessionManager.loadSavedSessions();
+                
+                // Mettre à jour le titre de la session actuelle
+                const currentSession = SessionManager.getCurrentSession();
+                if (currentSession && currentSession.name) {
+                    document.getElementById('current-session-name').textContent = currentSession.name;
+                }
+                
+                // Charger les chapitres disponibles dans le sélecteur
+                loadChapters();
+            } else {
+                console.error("SessionManager non disponible. Vérifiez que bd_creator_session_manager.js est bien chargé.");
+            }
+            
+            // Configurer les gestionnaires d'événements
+            setupEventListeners();
+        });
+        
+        function loadChapters() {
+            const chapterSelect = document.getElementById('chapter-select');
+            const currentSession = SessionManager.getCurrentSession();
+            
+            // Vider les options existantes sauf la première
+            while (chapterSelect.options.length > 1) {
+                chapterSelect.remove(1);
+            }
+            
+            // Ajouter les chapitres de la session actuelle
+            if (currentSession && currentSession.chapters) {
+                currentSession.chapters.forEach((chapter, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = chapter.title || `Chapitre ${index + 1}`;
+                    chapterSelect.appendChild(option);
+                });
+            }
+        }
+        
+        function setupEventListeners() {
+            // Gestionnaire pour le bouton de chargement de chapitre
+            const loadChapterBtn = document.getElementById('load-chapter-btn');
+            if (loadChapterBtn) {
+                loadChapterBtn.addEventListener('click', function() {
+                    const chapterSelect = document.getElementById('chapter-select');
+                    const selectedIndex = chapterSelect.value;
+                    
+                    if (selectedIndex !== "") {
+                        loadStoryboard(parseInt(selectedIndex));
+                    } else {
+                        alert("Veuillez sélectionner un chapitre");
+                    }
+                });
+            }
+            
+            // Gestionnaires pour les boutons de session
+            const saveSessionBtn = document.getElementById('save-session-btn');
+            const newSessionBtn = document.getElementById('new-session-btn');
+            const loadSessionSelect = document.getElementById('load-session-select');
+            
+            if (saveSessionBtn) {
+                saveSessionBtn.addEventListener('click', function() {
+                    const sessionName = prompt("Nom de la session :", 
+                        document.getElementById('current-session-name').textContent);
+                    if (sessionName) {
+                        SessionManager.saveSession(sessionName);
+                        document.getElementById('current-session-name').textContent = sessionName;
+                    }
+                });
+            }
+            
+            if (newSessionBtn) {
+                newSessionBtn.addEventListener('click', function() {
+                    if (confirm("Créer une nouvelle session ? Les modifications non sauvegardées seront perdues.")) {
+                        SessionManager.createNewSession();
+                        document.getElementById('current-session-name').textContent = "Nouvelle session";
+                        loadChapters();
+                    }
+                });
+            }
+            
+            if (loadSessionSelect) {
+                loadSessionSelect.addEventListener('change', function() {
+                    const selectedValue = this.value;
+                    if (selectedValue) {
+                        SessionManager.loadSession(selectedValue);
+                        document.getElementById('current-session-name').textContent = selectedValue;
+                        loadChapters();
+                        this.value = "";  // Réinitialiser le sélecteur
+                    }
+                });
+            }
+            
+            // Gestionnaires pour les boutons d'édition de storyboard
+            const editStoryboardBtn = document.getElementById('edit-storyboard-btn');
+            const saveStoryboardBtn = document.getElementById('save-storyboard-btn');
+            
+            if (editStoryboardBtn) {
+                editStoryboardBtn.addEventListener('click', function() {
+                    enableStoryboardEditing(true);
+                });
+            }
+            
+            if (saveStoryboardBtn) {
+                saveStoryboardBtn.addEventListener('click', function() {
+                    saveStoryboardChanges();
+                    enableStoryboardEditing(false);
+                });
+            }
+        }
+        
+        function loadStoryboard(chapterIndex) {
+            const currentSession = SessionManager.getCurrentSession();
+            if (!currentSession || !currentSession.chapters || !currentSession.chapters[chapterIndex]) {
+                alert("Chapitre non trouvé");
+                return;
+            }
+            
+            const chapter = currentSession.chapters[chapterIndex];
+            document.getElementById('chapter-title').textContent = chapter.title || `Chapitre ${chapterIndex + 1}`;
+            
+            const storyboardContainer = document.getElementById('storyboard-container');
+            
+            // Vérifier si le chapitre a un storyboard
+            if (chapter.storyboard) {
+                renderStoryboard(chapter.storyboard, storyboardContainer);
+            } else {
+                storyboardContainer.innerHTML = `
+                    <div class="empty-storyboard">
+                        <p>Aucun storyboard n'a été généré pour ce chapitre.</p>
+                        <button id="generate-storyboard-btn">Générer le storyboard</button>
+                    </div>
+                `;
+                
+                // Ajouter un gestionnaire pour le bouton de génération
+                document.getElementById('generate-storyboard-btn').addEventListener('click', function() {
+                    generateStoryboard(chapterIndex);
+                });
+            }
+        }
+        
+        function renderStoryboard(storyboard, container) {
+            // Implémenter le rendu du storyboard
+            container.innerHTML = '';
+            
+            if (Array.isArray(storyboard.pages)) {
+                storyboard.pages.forEach((page, pageIndex) => {
+                    const pageElement = document.createElement('div');
+                    pageElement.className = 'storyboard-page';
+                    pageElement.innerHTML = `
+                        <h3>Page ${pageIndex + 1}</h3>
+                        <div class="page-panels" data-page="${pageIndex}"></div>
+                    `;
+                    
+                    const panelsContainer = pageElement.querySelector('.page-panels');
+                    
+                    if (Array.isArray(page.panels)) {
+                        page.panels.forEach((panel, panelIndex) => {
+                            const panelElement = document.createElement('div');
+                            panelElement.className = 'storyboard-panel';
+                            panelElement.innerHTML = `
+                                <h4>Case ${panelIndex + 1}</h4>
+                                <div class="panel-description" contenteditable="false">${panel.description || ''}</div>
+                                <h5>Dialogues :</h5>
+                                <div class="panel-dialogues" contenteditable="false">${panel.dialogues || ''}</div>
+                            `;
+                            panelsContainer.appendChild(panelElement);
+                        });
+                    }
+                    
+                    container.appendChild(pageElement);
+                });
+            } else {
+                container.innerHTML = '<p>Format de storyboard invalide.</p>';
+            }
+        }
+        
+        function enableStoryboardEditing(enable) {
+            const editableElements = document.querySelectorAll('.panel-description, .panel-dialogues');
+            editableElements.forEach(element => {
+                element.contentEditable = enable ? "true" : "false";
+                if (enable) {
+                    element.classList.add('editable');
+                } else {
+                    element.classList.remove('editable');
+                }
+            });
+            
+            // Afficher ou masquer le bouton de sauvegarde
+            const saveBtn = document.getElementById('save-storyboard-btn');
+            if (saveBtn) {
+                saveBtn.style.display = enable ? 'inline-block' : 'none';
+            }
+        }
+        
+        function saveStoryboardChanges() {
+            const chapterSelect = document.getElementById('chapter-select');
+            const selectedIndex = parseInt(chapterSelect.value);
+            const currentSession = SessionManager.getCurrentSession();
+            
+            if (isNaN(selectedIndex) || !currentSession || !currentSession.chapters || !currentSession.chapters[selectedIndex]) {
+                alert("Impossible de sauvegarder les modifications: chapitre non sélectionné");
+                return;
+            }
+            
+            const chapter = currentSession.chapters[selectedIndex];
+            if (!chapter.storyboard || !chapter.storyboard.pages) {
+                alert("Impossible de sauvegarder les modifications: storyboard non initialisé");
+                return;
+            }
+            
+            // Parcourir toutes les pages et panels pour récupérer les contenus édités
+            document.querySelectorAll('.storyboard-page').forEach((pageElement, pageIndex) => {
+                const panelElements = pageElement.querySelectorAll('.storyboard-panel');
+                
+                panelElements.forEach((panelElement, panelIndex) => {
+                    const descriptionElement = panelElement.querySelector('.panel-description');
+                    const dialoguesElement = panelElement.querySelector('.panel-dialogues');
+                    
+                    if (descriptionElement && dialoguesElement && 
+                        chapter.storyboard.pages[pageIndex] && 
+                        chapter.storyboard.pages[pageIndex].panels[panelIndex]) {
+                        
+                        chapter.storyboard.pages[pageIndex].panels[panelIndex].description = descriptionElement.innerHTML;
+                        chapter.storyboard.pages[pageIndex].panels[panelIndex].dialogues = dialoguesElement.innerHTML;
+                    }
+                });
+            });
+            
+            // Sauvegarder la session mise à jour
+            SessionManager.updateCurrentSession(currentSession);
+            alert("Modifications sauvegardées avec succès !");
+        }
+        
+        function generateStoryboard(chapterIndex) {
+            const currentSession = SessionManager.getCurrentSession();
+            if (!currentSession || !currentSession.chapters || !currentSession.chapters[chapterIndex]) {
+                alert("Chapitre non trouvé");
+                return;
+            }
+            
+            const chapter = currentSession.chapters[chapterIndex];
+            const storyboardContainer = document.getElementById('storyboard-container');
+            
+            // Afficher un message de chargement
+            storyboardContainer.innerHTML = '<p>Génération du storyboard en cours...</p>';
+            
+            // Simuler un temps de chargement (À remplacer par une vraie génération)
+            setTimeout(() => {
+                // Créer un storyboard d'exemple
+                const exampleStoryboard = {
+                    pages: [
+                        {
+                            panels: [
+                                {
+                                    description: "Description visuelle de la première case.",
+                                    dialogues: "Personnage 1: Voici un dialogue d'exemple."
+                                },
+                                {
+                                    description: "Description visuelle de la deuxième case.",
+                                    dialogues: "Personnage 2: Un autre dialogue d'exemple."
+                                }
+                            ]
+                        }
+                    ]
+                };
+                
+                // Mettre à jour le chapitre avec le nouveau storyboard
+                chapter.storyboard = exampleStoryboard;
+                
+                // Sauvegarder la session mise à jour
+                SessionManager.updateCurrentSession(currentSession);
+                
+                // Afficher le storyboard généré
+                renderStoryboard(exampleStoryboard, storyboardContainer);
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
